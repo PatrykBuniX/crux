@@ -78,7 +78,7 @@ mod shared {
                         event_with_user_info(pending, Event::DurationElapsed),
                     );
                 }
-                Event::DurationElapsed(pending, TimeResponse::DurationElapsed) => {
+                Event::DurationElapsed(pending, TimeResponse::DurationElapsed { id: _ }) => {
                     if model.debounce.resolve(pending) {
                         model.debounce_complete = true;
                     }
@@ -169,7 +169,7 @@ mod tests {
     };
     use chrono::{DateTime, Utc};
     use crux_core::{testing::AppTester, Core};
-    use crux_time::TimeResponse;
+    use crux_time::{TimeResponse, TimerId};
 
     #[test]
     pub fn test_time() {
@@ -216,12 +216,15 @@ mod tests {
 
         // resolve and run loop
         app.update(
-            app.resolve(&mut request1, TimeResponse::DurationElapsed)
-                .unwrap()
-                .events
-                .into_iter()
-                .next()
-                .unwrap(),
+            app.resolve(
+                &mut request1,
+                TimeResponse::DurationElapsed { id: TimeId(0) },
+            )
+            .unwrap()
+            .events
+            .into_iter()
+            .next()
+            .unwrap(),
             &mut model,
         );
 
@@ -234,12 +237,15 @@ mod tests {
 
         // resolve and run loop
         app.update(
-            app.resolve(&mut request2, TimeResponse::DurationElapsed)
-                .unwrap()
-                .events
-                .into_iter()
-                .next()
-                .unwrap(),
+            app.resolve(
+                &mut request2,
+                TimeResponse::DurationElapsed { id: TimeId(0) },
+            )
+            .unwrap()
+            .events
+            .into_iter()
+            .next()
+            .unwrap(),
             &mut model,
         );
 
